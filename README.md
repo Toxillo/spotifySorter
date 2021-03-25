@@ -1,7 +1,8 @@
 # Spotify Sorter
 This splits a playlist into 4 playlists and fills them with songs with similar energy levels.
-## Installation
 
+## Installation
+Clone the repository to any location
 
 ## Usage
 
