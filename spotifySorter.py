@@ -3,13 +3,11 @@ import json
 import webbrowser
 import math
 from requests_oauthlib import OAuth2Session
+from secrets import client_id, client_secret, spotify_user_id
 
-#TODO Spotify api only returns 100 results workaround
 scope = 'playlist-modify-public'
 redirect_uri = 'https://example.com'
-client_id = '59051dc1dadc4d349d40a6595e53a552'
-client_secret = '0e852f30aa894fb38ae2cd976e8753b0'
-spotify_user_id = 'toxiiio'
+
 
 oauth = None
 playlist_size = 0
@@ -38,7 +36,7 @@ def main():
 def sortByEnergy(playlist):
 	newPlaylists = [[],[],[],[]]
 	features = []
-	#Collect every id and add it to the request string, seperated by '%2C' aka ','
+	#Collect every id and add it to the request string, separated by '%2C' aka ','
 	for response in playlist:
 		requestString = 'https://api.spotify.com/v1/audio-features?ids='
 		for track in response['items']:
