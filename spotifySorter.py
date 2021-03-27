@@ -1,6 +1,7 @@
 import requests
 import json
 import webbrowser
+import argparse
 import math
 from requests_oauthlib import OAuth2Session
 from secrets import client_id, client_secret, spotify_user_id
@@ -8,23 +9,28 @@ from secrets import client_id, client_secret, spotify_user_id
 scope = 'playlist-modify-public'
 redirect_uri = 'https://example.com'
 
-
+playlist_names = ['Calm', 'Relaxed', 'Standard', 'Energetic']
 oauth = None
 playlist_size = 0
 
 def main():
 	global playlist_size
+
+	parser = argparse.ArgumentParser(description='Sort Spotify playlist by energy.')
+	parser.add_argument('id', help='The ID of the playlist to be sorted. The ID is the last part of the 								Spotify URI which can be found by right-clicking the playlist and 									selecting "Copy Spotify URI" under the "Share" option')
+
+	args = parser.parse_args()
+	playlist_id = args.id
 	#Acquire authorization token for private requests
 	oauth = getToken()
-	#Request all playlists by the user with the id 'spotify_user_id'
-	r = oauth.get('https://api.spotify.com/v1/users/{}/playlists'.format(spotify_user_id))
+	#Request the playlist with the id given by the user
+	r = oauth.get('https://api.spotify.com/v1/playlists/{}'.format(playlist_id))
 	#Check if the request was successful
 	if (r.status_code != requests.codes.ok):
-		print("Request failed! Response code is: %d", r.status_code)
+		print("Request for playlist failed! Response code is: %d", r.status_code)
 		return
 	response = r.json()
-	playlist_id = response['items'][0]['id']
-	playlist_size = response['items'][0]['tracks']['total']
+	playlist_size = response['tracks']['total']
 	#Request the tracks of the playlist in chunks of 100 to avoid API limitations
 	playlist = [oauth.get('https://api.spotify.com/v1/playlists/{}/tracks?offset={}'
 				.format(playlist_id, i*100)).json()
@@ -66,7 +72,7 @@ def populatePlaylists(playlists):
 	for playlist in playlists:
 		#Specify the name of the playlist
 		request_body = json.dumps({
-			'name' : 'playlist%d' % index
+			'name' : playlist_names[index]
 		})
 		query = "https://api.spotify.com/v1/users/{}/playlists".format(spotify_user_id)
 		#Make the post request to create the playlist
